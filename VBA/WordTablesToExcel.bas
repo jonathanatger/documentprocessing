@@ -16,7 +16,7 @@ Dim jCol As Integer 'column index in Excel
 
 Dim lastrow As Long
 
-'Sélectionner un dossier
+'Select Directory
 With Application.FileDialog(msoFileDialogFolderPicker)
     .Title = "Select Location Directory"
     .ButtonName = "Open"
@@ -27,8 +27,8 @@ With Application.FileDialog(msoFileDialogFolderPicker)
     End If
 End With
 
-'Sélectionne le premier fichier
-strFile = Dir(strFolder) '//First file
+'Gets first file
+strFile = Dir(strFolder)
 jRow = 1
 
 While Not strFile = ""
@@ -36,26 +36,26 @@ While Not strFile = ""
     jCol = 1
     strFile = strFolder + strFile
     
-    'Ouvre le fichier Word
+    'Opens Word Document
     Set wdDoc = GetObject(strFile)
         
         With wdDoc
-            'Si il n'y a pas de tableau, message d'erreur
+            'If no table, error message
             If wdDoc.Tables.Count = 0 Then
                 MsgBox "This document contains no tables", _
                     vbExclamation, "Import Word Table"
             Else
-                'Passe sur la feuille Données
-                Set ws = Worksheets("Données")
+                'Gets on the sheet "Data"
+                Set ws = Worksheets("Data")
                 Sheets("Données").Select
                 
-                'Parcours les tableaux un a un et copie les valeurs dans des cellules sur une même ligne
+                'Runs through all tables and copy everyone of them
                 For TableNo = 1 To wdDoc.Tables.Count
                     With .Tables(TableNo)
                         For iRow = 1 To .Rows.Count
                             For iCol = 1 To .Columns.Count
                                 On Error Resume Next
-                                'Copie des valeurs
+                                'Copying a value
                                 ActiveSheet.Cells(jRow, jCol) = WorksheetFunction.Clean(.Cell(iRow, iCol).Range.Text)
                                 jCol = jCol + 1
                                 On Error GoTo 0
@@ -68,7 +68,7 @@ While Not strFile = ""
         
     Set wdDoc = Nothing
     
-    strFile = Dir() 'Passe au fichier suivant
+    strFile = Dir() 'Next file
 
 Wend
 MsgBox "Complete"
